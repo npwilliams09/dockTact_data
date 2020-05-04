@@ -1,4 +1,5 @@
 # deepContact_DataPipeline
+## In Progress
 Transforms PPIDOCK4 dataset into tfrecord data with input(s) and target(s) ready for model training
 
 Data sourced from: http://biodev.cea.fr/interevol/ppi4dock/

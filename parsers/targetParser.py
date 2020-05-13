@@ -3,6 +3,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from math import pi
+from .helpers import getSeqIndex, centralCarbon
 
 '''
 Functions to parse single target complex into a contact or distance matrix
@@ -35,11 +36,7 @@ def contactParser(targetFile,threshold):
 
             mat[getSeqIndex(resPair[0]),getSeqIndex(resPair[1])] = 1 #set to true for a contact
 
-    f, ax = plt.subplots(figsize=(11, 9))
 
-    # Draw the heatmap with the mask and correct aspect ratio
-    sns.heatmap(mat)
-    plt.show()
 
     return mat
 
@@ -60,41 +57,12 @@ def distanceParser(targetFile,strippedRes):
     for resA in model[chainIDs[0]]:
         for resB in model[chainIDs[1]]:
             mat[getSeqIndex(resA),getSeqIndex(resB)] = residueDistance(resA,resB)
-    sns.heatmap(mat)
-
-
-    plt.savefig("distogram.png")
 
     return mat
 
 def residueDistance(resA,resB):
     return centralCarbon(resA) - centralCarbon(resB)
 
-def centralCarbon(residue):
-    if "CA" in residue:
-        return residue["CA"]
-    else:#special case for glycine residues
-        #bipython code sample for virtual beta carbon
-        n = residue['N'].get_vector()
-        c = residue['C'].get_vector()
-        ca = residue['CA'].get_vector()
-
-        #center at origin
-        n = n-ca
-        c = c-ca
-        #find rotation matrix that rotates n
-        #-120 degrees along the ca-c vector
-        rot = PDB.rotaxis(-pi*120.0/180.0)
-        #apply rotation to ca-n vector
-        cb_at_origin = n.left_multiply(rot)
-        #put on top of ca atom
-        cb = cb_at_origin+ca
-        return cb
-
-
-def getSeqIndex(residue):
-    ids = residue.get_id()
-    return ids[1] - 1
 
 def parseStrippedRes(filePath):
     with open(filePath) as file:

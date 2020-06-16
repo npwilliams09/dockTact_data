@@ -4,7 +4,7 @@ parses the "PPI4DOCK_list.txt" file into a .json file for convenience
 and returns the output dictionary
 '''
 def textParser():
-    fileAddr = "./PPI4DOCK/PPI4DOCK_list.txt" #Yes, i like using relative addresses. Let me keep this one bad habit
+    fileAddr = "./PPI4DOCK/PPI4DOCK_list.txt"
     dic = {}
 
     file = open(fileAddr,"r")

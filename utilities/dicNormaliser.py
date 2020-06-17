@@ -38,3 +38,7 @@ class dicNormaliser:
 
                 dic[prot][chain] = df
         return dic
+
+    def fit_transform(self,dic):
+        self.fit(dic)
+        return self.transform(dic)

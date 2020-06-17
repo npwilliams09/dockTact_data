@@ -59,10 +59,12 @@ def rawChainParser(filepath, chainID, pssm):
         #get pssm row
         pssmRow = pssm[seqID-1]
 
-        for key in pssmRow.keys():
-            row["pssm_" + key] = pssmRow[key]
+        row["aligns"] = sum(pssmRow.values())  # total alignments
+        if(row["aligns"]!= 0):
+            for key in pssmRow.keys():
+                row["pssm_" + key] = pssmRow[key]/row["aligns"]
 
-        row["aligns"] = sum(pssmRow.values()) #total alignments
+
 
         if (residue.is_disordered()):
             print(f"disorded atom in res {getSeqIndex()}")

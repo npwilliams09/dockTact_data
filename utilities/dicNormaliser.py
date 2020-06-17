@@ -1,17 +1,40 @@
 import pandas as pd
 class dicNormaliser:
-    def __init__(self, columns=None):
+    def __init__(self, columns, coords = False):
         self.columns = columns
+        self.coords = coords
 
     def fit(self, dic):
         mins = []
         maxs = []
+        if (self.coords):
+            cols = self.columns + ['x','y','z']
+        else:
+            cols = self.columns
+        print(cols)
         for prot in dic:
             for chain in dic[prot]:
-                mins.append(dic[prot][chain].min())
-                maxs.append(dic[prot][chain].max())
-        max = pd.concat(maxs,axis=1,keys=[s.name for s in maxs).max(axis=1)
+                mins.append(dic[prot][chain][cols].min())
+                maxs.append(dic[prot][chain][cols].max())
+        min = pd.concat(mins,axis=1,keys=[s.name for s in mins]).min(axis=1)
+        max = pd.concat(maxs,axis=1,keys=[s.name for s in maxs]).max(axis=1)
+        self.range = max - min
+        print(self.range)
+        self.min = min
 
     def transform(self,dic):
-        #
-        return 0
+
+        for prot in dic:
+            for chain in dic[prot]:
+                df = dic[prot][chain]
+                df[self.columns] = df[self.columns].sub(self.min[self.columns])
+                df[self.columns] = df[self.columns].div(self.range[self.columns])
+
+                if (self.coords):
+                    coordRange = self.range[['x','y','z']].max()
+                    df[['x','y','z','res_depth','ca_depth']] = df[['x','y','z','res_depth','ca_depth']]-(coordRange/-2)
+                    df[['x','y','z','res_depth','ca_depth']] = df[['x','y','z','res_depth','ca_depth']]/(coordRange)
+                    df[['x','y','z']] = (df[['x','y','z']] * 2) - 1
+
+                dic[prot][chain] = df
+        return dic

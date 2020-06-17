@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 def main():
 
-    targets = ["1bgx_AB","1bgx_AC"]
+    targets = ["1b8d_CF","1azs_FD","1d4v_BF"]
     protInfo = textParser()
 
     train,test = trainTestSplit(protInfo)
@@ -31,10 +31,19 @@ def main():
             master[prot[:-3]][chains[1]] = featureExtract(prot,chains[1])
         print(prot)
 
-    print(master)
-
-    normaliser = dicNormaliser()
+    normCols = ["hsed","hseu","seqId","aligns"]
+    normaliser = dicNormaliser(columns=normCols,coords=True)
     normaliser.fit(master)
+
+    pd.set_option('display.max_columns', 60)
+    master = normaliser.transform(master)
+
+    df = pd.DataFrame()
+    for prot in master:
+        for chain in master[prot]:
+            df = pd.concat([df,master[prot][chain]],axis=0,ignore_index=True)
+    print(df.describe())
+    return master
 
     '''
     prefix = "./PPI4DOCK/PPI4DOCK_docking_set/"

@@ -9,28 +9,28 @@ from .helpers import getSeqIndex, centralCarbon
 Functions to parse single target complex into a contact or distance matrix
 '''
 
-def distanceParser(targetFile,strippedRes):
+def distanceParser(targetFile,chains):
     parser = PDB.PDBParser()
     structure = parser.get_structure(targetFile[-14:-3], targetFile)
 
     model = structure[0]  # only one model
-    chainIDs = [chain.id for chain in model]
 
-    dimA = len(model[chainIDs[0]]) + strippedRes[0]
-    dimB = len(model[chainIDs[1]]) + strippedRes[1]
+    dimA = len(model[chains[0]])
+    dimB = len(model[chains[1]])
     dimensions = (dimA,dimB)
 
     mat = np.zeros(shape=dimensions)
 
-    for resA in model[chainIDs[0]]:
-        for resB in model[chainIDs[1]]:
-            mat[getSeqIndex(resA),getSeqIndex(resB)] = residueDistance(resA,resB)
-
+    for i,resA in enumerate(model[chains[0]]):
+        for j,resB in enumerate(model[chains[1]]):
+            mat[i,j] = residueDistance(resA,resB)
     return mat
+
+def dis2contact(mat,threshold=8):
+    return np.where(mat <= 8, 1, 0)
 
 def residueDistance(resA,resB):
     return centralCarbon(resA) - centralCarbon(resB)
-
 
 def parseStrippedRes(filePath):
     with open(filePath) as file:

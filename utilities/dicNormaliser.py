@@ -11,7 +11,6 @@ class dicNormaliser:
             cols = self.columns + ['x','y','z']
         else:
             cols = self.columns
-        print(cols)
         for prot in dic:
             for chain in dic[prot]:
                 mins.append(dic[prot][chain][cols].min())
@@ -19,11 +18,9 @@ class dicNormaliser:
         min = pd.concat(mins,axis=1,keys=[s.name for s in mins]).min(axis=1)
         max = pd.concat(maxs,axis=1,keys=[s.name for s in maxs]).max(axis=1)
         self.range = max - min
-        print(self.range)
         self.min = min
 
     def transform(self,dic):
-
         for prot in dic:
             for chain in dic[prot]:
                 df = dic[prot][chain]
@@ -35,7 +32,6 @@ class dicNormaliser:
                     df[['x','y','z','res_depth','ca_depth']] = df[['x','y','z','res_depth','ca_depth']]-(coordRange/-2)
                     df[['x','y','z','res_depth','ca_depth']] = df[['x','y','z','res_depth','ca_depth']]/(coordRange)
                     df[['x','y','z']] = (df[['x','y','z']] * 2) - 1
-
                 dic[prot][chain] = df
         return dic
 

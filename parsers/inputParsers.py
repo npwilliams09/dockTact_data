@@ -62,6 +62,8 @@ def rawChainParser(filepath, chainID, pssm):
         row["aligns"] = sum(pssmRow.values())  # total alignments
         if(row["aligns"]!= 0):
             for key in pssmRow.keys():
+                if key not in list('ABCDEFGHIKLMNPQRSTVWYZ'):
+                    print(key)
                 row["pssm_" + key] = pssmRow[key]/row["aligns"]
 
 
@@ -72,7 +74,7 @@ def rawChainParser(filepath, chainID, pssm):
         df = df.append(row,ignore_index=True)
 
     #check for missed columns in pssm
-    for a in 'ACDEFGHIKLMNPQRSTVWY':  # check for missing aas
+    for a in 'ABCDEFGHIKLMNPQRSTVWYZ':  # check for missing aas
         if ("pssm_" + a) not in df:
             df["pssm_" + a] = 0.0
 
@@ -95,7 +97,9 @@ def rawChainParser(filepath, chainID, pssm):
 
     df = pd.concat([df,aaDf,ssDf],axis=1).drop(["AA","ss"],axis=1)
 
-    assert df.shape[1] == 60, f"Incorrect pssmdf shape = {df.shape[1]} for file: {filepath}" #error check
+    if(df.shape[1] != 62):
+        print(df)
+    assert df.shape[1] == 62, f"Incorrect pssmdf shape = {df.shape[1]} for file: {filepath}" #error check
     return df
 
 #returns df of pssm given a fasta MSA as input

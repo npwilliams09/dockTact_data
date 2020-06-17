@@ -23,14 +23,13 @@ def rawChainParser(filepath, chainID, pssm):
     hs = PDB.HSExposure.HSExposureCA(model)
 
     df = pd.DataFrame()
-    acids = getAminoAcids(structure)
-
-    for i,residue in enumerate(model[chainID]):
+    for residue in model[chainID]:
         seqID = getSeqIndex(residue)
 
         row = {}
         x,y,z = getResCoords(residue)
-        row["AA"] = acids[i]
+        resName = residue.get_resname()
+        row["AA"] = PDB.Polypeptide.three_to_one(resName)
         row["x"] = x[0]
         row["y"] = y[0]
         row["z"] = z[0]
@@ -96,7 +95,7 @@ def rawChainParser(filepath, chainID, pssm):
     df["z"] = df["z"] - (max["z"] + min["z"]) / 2
 
     df = pd.concat([df,aaDf,ssDf],axis=1).drop(["AA","ss"],axis=1)
-
+    df = df.fillna(0.0)
     if(df.shape[1] != 62):
         print(df)
     assert df.shape[1] == 62, f"Incorrect pssmdf shape = {df.shape[1]} for file: {filepath}" #error check

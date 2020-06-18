@@ -13,6 +13,9 @@ def main():
     print("Parsing Text Files...")
     protInfo = textParser()
 
+    print("distanceFilter")
+    protInfo = sizeFilter(protInfo,250000)
+
     print("Splitting Data...")
     train,test = trainTestSplit(protInfo)
 
@@ -62,6 +65,14 @@ def loadSet(setList,breakPoint=10000):
             return master
     print()
     return master
+
+def sizeFilter(protInfo,size=250000):
+    newDic = {}
+    for x in protInfo.keys():
+        combinedAAs = int(protInfo[x]["nb_AA1"])*int(protInfo[x]["nb_AA2"])
+        if (combinedAAs < size):
+            newDic[x] = protInfo[x]
+    return newDic
 
 def loadTargets(complexes):
     end = len(complexes)

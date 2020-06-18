@@ -65,8 +65,6 @@ def rawChainParser(filepath, chainID, pssm):
                     print(key)
                 row["pssm_" + key] = pssmRow[key]/row["aligns"]
 
-
-
         if (residue.is_disordered()):
             print(f"disorded atom in res {getSeqIndex()}")
 

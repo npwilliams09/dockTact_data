@@ -27,7 +27,7 @@ def distanceParser(targetFile,chains):
     return mat
 
 def dis2contact(mat,threshold=8):
-    return np.where(mat <= 8, 1, 0)
+    return np.where(mat <= threshold, 1, 0)
 
 def residueDistance(resA,resB):
     return centralCarbon(resA) - centralCarbon(resB)

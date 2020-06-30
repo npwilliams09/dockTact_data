@@ -4,7 +4,6 @@ from parsers.inputParsers import rawChainParser, msa2pssm
 from utilities.dataSplit import trainTestSplit
 from utilities.dicNormaliser import dicNormaliser
 import os
-
 import numpy as np
 import gc
 
@@ -13,7 +12,7 @@ def main():
     print("Parsing Text Files...")
     protInfo = textParser()
 
-    print("distanceFilter")
+    print("Filtering Proteins Over Size Threshold...")
     protInfo = sizeFilter(protInfo,250000)
 
     print("Splitting Data...")
@@ -43,6 +42,8 @@ def main():
     print("Load and Save Targets...")
     complexes = list(protInfo.keys())
     loadTargets(complexes)
+
+    print("Done, Output saved to folder :)")
 
 def loadSet(setList,breakPoint=10000):
     master = {}

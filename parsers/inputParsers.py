@@ -4,7 +4,7 @@ from Bio.Align import AlignInfo
 from Bio.Seq import Seq
 from Bio.PDB.ResidueDepth import ResidueDepth
 import pandas as pd
-from .helpers import getSeqIndex, getResCoords, centralCarbon
+from .helpers import getSeqIndex, getResCoords, getPharmacophoreDict
 from sklearn.preprocessing import LabelBinarizer
 '''
 Functions to parse single inputs
@@ -19,6 +19,8 @@ def rawChainParser(filepath, chainID, pssm):
     d = PDB.DSSP(model, filepath)
 
     rd = ResidueDepth(model)
+
+    pharmDic = getPharmacophoreDict()
 
     hs = PDB.HSExposure.HSExposureCA(model)
 
@@ -61,17 +63,19 @@ def rawChainParser(filepath, chainID, pssm):
         row["aligns"] = sum(pssmRow.values())  # total alignments
         if(row["aligns"]!= 0):
             for key in pssmRow.keys():
-                if key not in list('ABCDEFGHIKLMNPQRSTVWYZ'):
+                if key not in list('ABCDEFGHIKLMNPQRSTUVWYZ'):
                     print(key)
                 row["pssm_" + key] = pssmRow[key]/row["aligns"]
 
         if (residue.is_disordered()):
             print(f"disorded atom in res {getSeqIndex()}")
 
+        row.update(pharmDic[row["AA"]])
+
         df = df.append(row,ignore_index=True)
 
     #check for missed columns in pssm
-    for a in 'ABCDEFGHIKLMNPQRSTVWYZ':  # check for missing aas
+    for a in 'ABCDEFGHIKLMNPQRSTUVWYZ':  # check for missing aas
         if ("pssm_" + a) not in df:
             df["pssm_" + a] = 0.0
 
@@ -94,9 +98,11 @@ def rawChainParser(filepath, chainID, pssm):
 
     df = pd.concat([df,aaDf,ssDf],axis=1).drop(["AA","ss"],axis=1)
     df = df.fillna(0.0)
-    if(df.shape[1] != 62):
+    if(df.shape[1] != 72):
         print(df)
-    assert df.shape[1] == 62, f"Incorrect pssmdf shape = {df.shape[1]} for file: {filepath}" #error check
+    assert df.shape[1] == 72, f"Incorrect pssmdf shape = {df.shape[1]} for file: {filepath}" #error check
+    #pd.set_option('display.max_columns', 500)
+    #print(df.describe())
     return df
 
 #returns df of pssm given a fasta MSA as input

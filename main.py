@@ -6,6 +6,7 @@ from utilities.dicNormaliser import dicNormaliser
 import os
 import numpy as np
 import gc
+import pandas as pd
 
 def main():
     makeFolder("./output")
@@ -20,6 +21,8 @@ def main():
 
     print("Load Train Set...")
     trainDic = loadSet(train)
+
+    return 0
 
     normCols = ["hsed","hseu","seqId","aligns"]
     normaliser = dicNormaliser(columns=normCols,coords=True)
@@ -64,7 +67,6 @@ def loadSet(setList,breakPoint=10000):
         if (i>=breakPoint):
             print()
             return master
-    print()
     return master
 
 def sizeFilter(protInfo,size=250000):
@@ -119,6 +121,8 @@ def featureExtract(target, chain):
     pssm = msa2pssm(msaFile)
 
     output = rawChainParser(chainFile, chain, pssm)
+    pd.set_option('display.max_columns', 500)
+    print(output)
     return output
 
 def makeFolder(path):

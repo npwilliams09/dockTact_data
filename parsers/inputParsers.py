@@ -4,7 +4,7 @@ from Bio.Align import AlignInfo
 from Bio.Seq import Seq
 from Bio.PDB.ResidueDepth import ResidueDepth
 import pandas as pd
-from .helpers import getSeqIndex, getResCoords, getPharmacophoreDict
+from .helpers import getSeqIndex, getResCoords, getPharmacophoreDict, centralCarbon
 from sklearn.preprocessing import LabelBinarizer
 '''
 Functions to parse single inputs
@@ -54,7 +54,7 @@ def rawChainParser(filepath, chainID, pssm):
             row["hseu"] = 0
             row["hsed"] = 0
 
-        row["seqId"] = seqID -1
+        row["seqId"] = seqID
         #row["bFactor"] = centralAtom.get_bfactor() #must be done using zhang lab tool resQ instead
 
         #get pssm row
@@ -104,6 +104,28 @@ def rawChainParser(filepath, chainID, pssm):
     #pd.set_option('display.max_columns', 500)
     #print(df.describe())
     return df
+
+#Returns adjacency matrix
+def adjacencyMat(file, chainID, seqIDs, normalise=True):
+    size = len(seqIDs)
+    mat = np.zeros(shape=(size,size))
+
+    parser = PDB.PDBParser()
+    structure = parser.get_structure(chainID, file)
+    chain = structure[0][chainID]
+
+    for i,resA in enumerate(seqIDs):
+        for j, resB in enumerate(seqIDs):
+            distance = centralCarbon(chain[resA]) - centralCarbon(chain[resB])
+            mat[i][j] = distance
+
+    thresh = 8.0
+    mat = np.where(mat < thresh,thresh - mat,0)
+
+    if normalise:
+        mat = mat/thresh
+    return mat
+
 
 #returns df of pssm given a fasta MSA as input
 def msa2pssm(msaFile):

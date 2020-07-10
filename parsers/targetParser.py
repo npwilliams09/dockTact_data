@@ -9,20 +9,22 @@ from .helpers import getSeqIndex, centralCarbon
 Functions to parse single target complex into a contact or distance matrix
 '''
 
-def distanceParser(targetFile,chains):
+def distanceParser(targetFile,chains, seqIDs):
     parser = PDB.PDBParser()
     structure = parser.get_structure(targetFile[-14:-3], targetFile)
 
     model = structure[0]  # only one model
 
-    dimA = len(model[chains[0]])
-    dimB = len(model[chains[1]])
+    dimA = len(seqIDs[0])
+    dimB = len(seqIDs[1])
     dimensions = (dimA,dimB)
 
     mat = np.zeros(shape=dimensions)
 
-    for i,resA in enumerate(model[chains[0]]):
-        for j,resB in enumerate(model[chains[1]]):
+    for i,idA in enumerate(seqIDs[0]):
+        for j,idB in enumerate(seqIDs[1]):
+            resA = model[chains[0]][idA]
+            resB = model[chains[1]][idB]
             mat[i,j] = residueDistance(resA,resB)
     return mat
 

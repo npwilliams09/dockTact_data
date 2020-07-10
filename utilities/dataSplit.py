@@ -19,7 +19,7 @@ def trainTestSplit(protInfo):
 
     return train,test
 
-def surfaceResidues(df,threshold):
+def surfaceResidues(df,threshold=10.0):
     df = df[df["res_depth"] < threshold]
-    seqIDs = list(df["seqId"])
+    seqIDs = [int(x) for x in list(df["seqId"])]
     return df,seqIDs

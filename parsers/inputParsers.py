@@ -29,18 +29,26 @@ def rawChainParser(filepath, chainID, pssm):
         seqID = getSeqIndex(residue)
 
         row = {}
-        x,y,z = getResCoords(residue)
+        #x,y,z = getResCoords(residue)
         resName = residue.get_resname()
         row["AA"] = PDB.Polypeptide.three_to_one(resName)
+        '''
         row["x"] = x[0]
         row["y"] = y[0]
         row["z"] = z[0]
-
+        '''
         tupKey = (chainID, (' ', seqID, ' '))
         row["res_depth"] = rd[tupKey][0]
         row["ca_depth"] = rd[tupKey][1]
 
-        dssp = d[(chainID,seqID)]
+        try:
+            dssp = d[(chainID,seqID)]
+        except:
+            print([x for x in d])
+            print(filepath)
+            print(chainID)
+            print(d[(chainID,seqID-1)])
+
 
         row["ss"] = dssp[2]
         row["asa"] = dssp[3]
@@ -90,33 +98,39 @@ def rawChainParser(filepath, chainID, pssm):
     ssDf = pd.DataFrame(ssTransformed,columns=ssCols)
 
     #center coordinates
+    '''
     max = df.max()
     min = df.min()
     df["x"] = df["x"] - (max["x"] + min["x"]) / 2
     df["y"] = df["y"] - (max["y"] + min["y"]) / 2
     df["z"] = df["z"] - (max["z"] + min["z"]) / 2
-
+    '''
     df = pd.concat([df,aaDf,ssDf],axis=1).drop(["AA","ss"],axis=1)
     df = df.fillna(0.0)
-    if(df.shape[1] != 72):
+    if(df.shape[1] != 69):
         print(df)
-    assert df.shape[1] == 72, f"Incorrect pssmdf shape = {df.shape[1]} for file: {filepath}" #error check
+    assert df.shape[1] == 69, f"Incorrect pssmdf shape = {df.shape[1]} for file: {filepath}" #error check
     #pd.set_option('display.max_columns', 500)
     #print(df.describe())
     return df
 
 #Returns adjacency matrix
-def adjacencyMat(file, chainID, seqIDs, normalise=True):
+def adjacencyMat(prot, chainID, seqIDs, normalise=True):
     size = len(seqIDs)
     mat = np.zeros(shape=(size,size))
 
+    prefix = "./PPI4DOCK/PPI4DOCK_docking_set/"
+    chainFile = f"{prefix}/{prot}/{chainID}_model_st.pdb"
     parser = PDB.PDBParser()
-    structure = parser.get_structure(chainID, file)
+    structure = parser.get_structure(chainID, chainFile)
     chain = structure[0][chainID]
 
     for i,resA in enumerate(seqIDs):
         for j, resB in enumerate(seqIDs):
-            distance = centralCarbon(chain[resA]) - centralCarbon(chain[resB])
+            if resA != resB:
+                distance = centralCarbon(chain[resA]) - centralCarbon(chain[resB])
+            else: #same residue,self loop
+                distance = 0
             mat[i][j] = distance
 
     thresh = 8.0

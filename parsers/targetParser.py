@@ -20,11 +20,17 @@ def distanceParser(targetFile,chains, seqIDs):
     dimensions = (dimA,dimB)
 
     mat = np.zeros(shape=dimensions)
-
+    print(targetFile)
     for i,idA in enumerate(seqIDs[0]):
         for j,idB in enumerate(seqIDs[1]):
-            resA = model[chains[0]][idA]
-            resB = model[chains[1]][idB]
+            try:
+                resA = model[chains[0]][idA]
+            except:
+                resA = model[chains[0]][('H_MLY',idA,' ')]
+            try:
+                resB = model[chains[1]][idB]
+            except:
+                resB = model[chains[1]][('H_MLY',idB,' ')]
             mat[i,j] = residueDistance(resA,resB)
     return mat
 

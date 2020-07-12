@@ -76,6 +76,7 @@ def loadSet(setList,breakPoint=100000):
         if (i>=breakPoint):
             print()
             return master
+    print()
     return master
 
 def sizeFilter(protInfo,size=250000):

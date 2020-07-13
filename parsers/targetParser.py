@@ -20,18 +20,16 @@ def distanceParser(targetFile,chains, seqIDs):
     dimensions = (dimA,dimB)
 
     mat = np.zeros(shape=dimensions)
-    print(targetFile)
-    for i,idA in enumerate(seqIDs[0]):
-        for j,idB in enumerate(seqIDs[1]):
-            try:
-                resA = model[chains[0]][idA]
-            except:
-                resA = model[chains[0]][('H_MLY',idA,' ')]
-            try:
-                resB = model[chains[1]][idB]
-            except:
-                resB = model[chains[1]][('H_MLY',idB,' ')]
-            mat[i,j] = residueDistance(resA,resB)
+
+    for resA in model[chains[0]]:
+        for resB in model[chains[1]]:
+            idxA = getSeqIndex(resA)
+            idxB = getSeqIndex(resB)
+
+            if (idxA in seqIDs[0] and idxB in seqIDs[1]):
+                i = seqIDs[0].index(idxA)
+                j = seqIDs[1].index(idxB)
+                mat[i, j] = residueDistance(resA, resB)
     return mat
 
 def dis2contact(mat,threshold=8):

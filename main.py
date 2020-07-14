@@ -12,7 +12,7 @@ import pandas as pd
 import traceback
 
 def main():
-    Threads = 8
+    Threads = 10
 
     makeFolder("./output")
     print("Parsing Text Files...")
@@ -136,6 +136,7 @@ def saveSet(dic):
         for chain in dic[prot]:
             path = f"./output/{prot}/{chain}_input.ft"
             data = dic[prot][chain]
+            data = data.reset_index(drop=True)
             data.to_feather(path)
         i += 1
         print(f'\r>>Saving Set: {"{:.2f}".format(i / entries * 100)}%',end='')

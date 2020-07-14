@@ -39,7 +39,7 @@ def main():
 
     print("Load Test Set...")
     testDic = threaded_process_range(test,Threads)
-    loadTargets(train, trainDic)
+    loadTargets(test, testDic)
 
     print("Normalise Test & Save...")
     testDic = normaliser.transform(testDic)

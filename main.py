@@ -7,7 +7,9 @@ import os
 import numpy as np
 import gc
 from threading import Thread
+from multiprocessing import Pool
 import pandas as pd
+import traceback
 
 def main():
     Threads = 8
@@ -66,30 +68,34 @@ def loadChain(prot,chain):
         np.save(f, adjMat)
     return df
 
-def process_range(id_range, store=None):
+def process_range(id_range):
     """process a number of ids, storing the results in a dict"""
-    if store is None:
+    try:
         store = {}
-    for i, id in enumerate(id_range):
-        store[id] = loadProt(id)
-        print(f'\r>>Loading Set: {"{:.2f}".format(i+1 / len(id_range) * 100)}%', end='')
-    return store
+        for i, id in enumerate(id_range):
+            store[id] = loadProt(id)
+            print(f'\r>>Loading Set: {"{:.2f}".format(i+1 / len(id_range) * 100)}%', end='')
+        return store
+    except:
+        traceback.print_exc()
+        raise
 
 def threaded_process_range(id_range, nthreads=1):
     """process the id range in a specified number of threads"""
-    store = {}
-    threads = []
+    pool = Pool(processes=nthreads)
+
+    ids = []
     # create the threads
     for i in range(nthreads):
-        ids = id_range[i::nthreads]
-        t = Thread(target=process_range, args=(ids, store))
-        threads.append(t)
+        ids.append(id_range[i::nthreads])
 
-    # start the threads
-    [t.start() for t in threads]
-    # wait for the threads to finish
-    [t.join() for t in threads]
-    return store
+    results = pool.map(process_range,ids)
+
+    dic = {}
+    for r in results:
+        dic.update(r)
+
+    return dic
 
 def sizeFilter(protInfo,size=250000):
     newDic = {}

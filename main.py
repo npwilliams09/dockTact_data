@@ -126,8 +126,6 @@ def saveSet(dic):
     entries = len(dic)
     i = 0
 
-    makeFolder("./output/chains")
-
     for prot in dic:
         for chain in dic[prot]:
             path = f"./output/{prot}/{chain}_input.ft"

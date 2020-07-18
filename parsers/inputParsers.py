@@ -115,7 +115,7 @@ def rawChainParser(filepath, chainID, pssm):
     return df
 
 #Returns adjacency matrix
-def adjacencyMat(prot, chainID, seqIDs, normalise=True):
+def adjacencyMat(prot, chainID, seqIDs, normalise=True, thresh = 6.0):
     size = len(seqIDs)
     mat = np.zeros(shape=(size,size))
 
@@ -133,7 +133,6 @@ def adjacencyMat(prot, chainID, seqIDs, normalise=True):
                 distance = 0
             mat[i][j] = distance
 
-    thresh = 8.0
     mat = np.where(mat < thresh,thresh - mat,0)
 
     if normalise:

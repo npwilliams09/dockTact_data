@@ -12,7 +12,8 @@ import pandas as pd
 import traceback
 
 def main():
-    Threads = 10
+    Threads = 1
+    pd.set_option('display.max_columns', 500)
 
     makeFolder("./output")
     print("Parsing Text Files...")
@@ -29,7 +30,7 @@ def main():
     loadTargets(train,trainDic)
 
     normCols = ["hsed","hseu","seqId","aligns",'res_depth','ca_depth']
-    normaliser = dicNormaliser(columns=normCols,coords=False)
+    normaliser = dicNormaliser(columns=normCols,coords=True)
 
     print("Normalise Train & Save...")
     trainDic = normaliser.fit_transform(trainDic)
@@ -62,7 +63,7 @@ def loadProt(prot):
 
 def loadChain(prot,chain):
     df = featureExtract(prot, chain)
-    df, ids = surfaceResidues(df)
+    ids = [int(x) for x in list(df["seqId"])]
     adjMat = adjacencyMat(prot, chain, ids)
     with open(f"./output/{prot}/{chain}_adjMat.npy", "wb") as f:
         np.save(f, adjMat)

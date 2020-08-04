@@ -29,8 +29,8 @@ class dicNormaliser:
 
                 if (self.coords):
                     coordRange = self.range[['x','y','z']].max()
-                    df[['x','y','z','res_depth','ca_depth']] = df[['x','y','z','res_depth','ca_depth']]-(coordRange/-2)
-                    df[['x','y','z','res_depth','ca_depth']] = df[['x','y','z','res_depth','ca_depth']]/(coordRange)
+                    df[['x','y','z']] = df[['x','y','z']]-(coordRange/-2)
+                    df[['x','y','z']] = df[['x','y','z']]/(coordRange)
                     df[['x','y','z']] = (df[['x','y','z']] * 2) - 1
                 dic[prot][chain] = df
         return dic

@@ -29,14 +29,14 @@ def rawChainParser(filepath, chainID, pssm):
         seqID = getSeqIndex(residue)
 
         row = {}
-        #x,y,z = getResCoords(residue)
+        x,y,z = getResCoords(residue)
         resName = residue.get_resname()
         row["AA"] = PDB.Polypeptide.three_to_one(resName)
-        '''
+
         row["x"] = x[0]
         row["y"] = y[0]
         row["z"] = z[0]
-        '''
+
         tupKey = (chainID, (' ', seqID, ' '))
         row["res_depth"] = rd[tupKey][0]
         row["ca_depth"] = rd[tupKey][1]
@@ -98,24 +98,24 @@ def rawChainParser(filepath, chainID, pssm):
     ssDf = pd.DataFrame(ssTransformed,columns=ssCols)
 
     #center coordinates
-    '''
+
     max = df.max()
     min = df.min()
     df["x"] = df["x"] - (max["x"] + min["x"]) / 2
     df["y"] = df["y"] - (max["y"] + min["y"]) / 2
     df["z"] = df["z"] - (max["z"] + min["z"]) / 2
-    '''
+
     df = pd.concat([df,aaDf,ssDf],axis=1).drop(["AA","ss"],axis=1)
     df = df.fillna(0.0)
-    if(df.shape[1] != 69):
+    if(df.shape[1] != 72):
         print(df)
-    assert df.shape[1] == 69, f"Incorrect pssmdf shape = {df.shape[1]} for file: {filepath}" #error check
+    assert df.shape[1] == 72, f"Incorrect pssmdf shape = {df.shape[1]} for file: {filepath}" #error check
     #pd.set_option('display.max_columns', 500)
-    #print(df.describe())
+
     return df
 
 #Returns adjacency matrix
-def adjacencyMat(prot, chainID, seqIDs, normalise=True, thresh = 6.0):
+def adjacencyMat(prot, chainID, seqIDs, normalise=True, mode = 'bool', thresh = 6.0):
     size = len(seqIDs)
     mat = np.zeros(shape=(size,size))
 
@@ -133,10 +133,14 @@ def adjacencyMat(prot, chainID, seqIDs, normalise=True, thresh = 6.0):
                 distance = 0
             mat[i][j] = distance
 
-    mat = np.where(mat < thresh,thresh - mat,0)
+    if mode == 'distance':
+        mat = np.where(mat < thresh,thresh - mat,0)
+        if normalise:
+            mat = mat / thresh
 
-    if normalise:
-        mat = mat/thresh
+    elif mode == 'bool':
+        mat = np.where(mat < thresh, 1, 0)
+
     return mat
 
 

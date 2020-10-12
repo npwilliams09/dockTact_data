@@ -1,6 +1,8 @@
 # dockTact_Data Pipeline
 ## In Progress
-Transforms PPIDOCK4 dataset into tfrecord data with input(s) and target(s) ready for model training
+Transforms PPIDOCK4 dataset into preprocessed data with input(s) and target(s) ready for model training
+
+Author: Nathan Williams
 
 Data sourced from: http://biodev.cea.fr/interevol/ppi4dock/
 
